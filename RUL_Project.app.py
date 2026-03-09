@@ -2,26 +2,39 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import joblib
-from tensorflow.keras.models import load_model
 import plotly.graph_objects as go
 import plotly.express as px
+import tensorflow as tf
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout
 
 # --- 1. إعدادات الصفحة ---
 st.set_page_config(page_title="Asset RUL Predictor", page_icon="🏭", layout="wide")
 
-# --- 2. تحميل الشبكة العصبية والسكيلر ---
+# --- 2. تحميل الشبكة العصبية والسكيلر (الطريقة الاحترافية) ---
 @st.cache_resource
 def load_ai_assets():
+    # 1. تحميل ميزان البيانات
     scaler = joblib.load('rul_scaler.pkl')
-    model = load_model('advanced_rul_model.h5')
+    
+    # 2. بناء "هيكل" الشبكة العصبية بنفس تفاصيل كولاب بالضبط
+    model = Sequential()
+    model.add(Dense(128, input_dim=4, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.2))
+    model.add(Dense(32, activation='relu'))
+    model.add(Dense(1, activation='linear'))
+    
+    # 3. صب "الأوزان والخبرة" جوه الهيكل (لتفادي تعارض الإصدارات)
+    model.load_weights('advanced_rul_model.h5')
+    
     return scaler, model
 
 try:
     scaler, model = load_ai_assets()
 except Exception as e:
-    # التعديل هنا: السيرفر هيطبع نوع الخطأ بالظبط عشان نحله
     st.error(f"⚠️ Error details: {e}")
-    st.info("💡 Tip: This usually means a version mismatch in scikit-learn or TensorFlow.")
     st.stop()
 
 # --- 3. رأس الصفحة ---
