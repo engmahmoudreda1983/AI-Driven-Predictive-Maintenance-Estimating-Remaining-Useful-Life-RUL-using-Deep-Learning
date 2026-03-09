@@ -19,7 +19,9 @@ def load_ai_assets():
 try:
     scaler, model = load_ai_assets()
 except Exception as e:
-    st.error("⚠️ Error loading models. Please ensure .h5 and .pkl files are in the folder.")
+    # التعديل هنا: السيرفر هيطبع نوع الخطأ بالظبط عشان نحله
+    st.error(f"⚠️ Error details: {e}")
+    st.info("💡 Tip: This usually means a version mismatch in scikit-learn or TensorFlow.")
     st.stop()
 
 # --- 3. رأس الصفحة ---
