@@ -39,8 +39,27 @@ st.title("🏭 Deep Learning Predictive Maintenance")
 st.markdown("Estimate the **Remaining Useful Life (RUL)** of power assets using advanced Artificial Neural Networks.")
 st.markdown("---")
 
-# --- 4. الشريط الجانبي (قراءات الحساسات) ---
-st.sidebar.header("🎛️ Sensor Readings")
+# --- 4. الشريط الجانبي (التوثيق وقراءات الحساسات) ---
+with st.sidebar:
+    st.header("📘 Project Documentation")
+    
+    st.subheader("1. Executive Summary")
+    st.write("This Deep Learning system utilizes Artificial Neural Networks (ANN) to predict the Remaining Useful Life (RUL) of critical power assets, enabling proactive maintenance strategies and preventing catastrophic failures.")
+    
+    st.subheader("2. AI Architecture")
+    st.write("Built using a Multi-Layer Perceptron (MLP) with 3 hidden layers (128, 64, and 32 neurons), utilizing ReLU activation to capture complex non-linear relationships between equipment stressors.")
+    
+    with st.expander("Show Sensor Definitions"):
+        st.write("**Operating Hours:** Cumulative running time (Aging).")
+        st.write("**Load Current:** Electrical stress (Amps).")
+        st.write("**Temperature:** Thermal stress (°C).")
+        st.write("**Vibration:** Mechanical wear (mm/s).")
+
+    st.markdown("---")
+    st.warning("⚠️ **DISCLAIMER:** This AI tool is a Decision-Support System intended for educational and research purposes. All maintenance actions must be verified by a qualified Electrical Engineer.")
+    st.markdown("---")
+    
+    st.header("🎛️ Sensor Readings")
 
 with st.sidebar.expander("⏱️ Operational Data", expanded=True):
     op_hours = st.slider("Operating Hours", 1000, 100000, 25000)
@@ -66,8 +85,7 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
         input_scaled = scaler.transform(input_data)
         raw_rul = model.predict(input_scaled)[0][0]
         
-        # --- التعديل الجديد: معايرة المقياس لـ 20 سنة (7300 يوم) ---
-        # نضرب الناتج في (7300 / 3000) لتوسيع النطاق بدون إعادة تدريب
+        # معايرة المقياس لـ 20 سنة (7300 يوم)
         predicted_rul = max(0, int(raw_rul * 2.433)) 
         
         # تحديد الحالة والكلمات المطلوبة بناءً على المقياس الجديد
@@ -94,7 +112,6 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
                                    {'range': [1000, 3650], 'color': "#fff3cd"}, 
                                    {'range': [3650, 7300], 'color': "#d1e7dd"}]}
             ))
-            # إضافة الكلمة (Safe, Warning, Risky) تحت الرقم
             fig_gauge.add_annotation(x=0.5, y=0.0, text=f"<b>{status}</b>", font=dict(size=28, color=color), showarrow=False)
             fig_gauge.update_layout(height=400, margin=dict(l=20, r=20, t=60, b=80))
             st.plotly_chart(fig_gauge, use_container_width=True)
