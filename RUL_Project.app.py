@@ -46,15 +46,11 @@ st.markdown("---")
 st.sidebar.header("🎛️ Sensor Readings")
 
 with st.sidebar.expander("⏱️ Operational Data", expanded=True):
-    # تعديل الماكسيمم لـ 100 ألف ساعة
     op_hours = st.slider("Operating Hours", 1000, 100000, 25000)
-    # تعديل الماكسيمم لـ 300 أمبير
     load_current = st.slider("Load Current (Amps)", 50.0, 300.0, 100.0)
 
 with st.sidebar.expander("🌡️ Condition Monitoring", expanded=True):
-    # تعديل الماكسيمم لـ 200 درجة
     temp = st.slider("Temperature (°C)", 20.0, 200.0, 55.0)
-    # تعديل الماكسيمم لـ 10 
     vibration = st.slider("Vibration (mm/s)", 0.1, 10.0, 2.0)
 
 # --- 5. زر التوقع ---
@@ -87,12 +83,12 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
         c1, c2 = st.columns(2)
         
         with c1:
-            # العداد (Gauge) وتعديل العنوان
+            # العداد (Gauge) بعد عكس المحور لتبدأ الأمان (الأخضر) من اليسار
             fig_gauge = go.Figure(go.Indicator(
                 mode = "gauge+number", value = predicted_rul,
                 title = {'text': f"Remaining Useful Life (RUL)<br><span style='font-size:0.8em;color:gray'>Status: {status}</span>", 'font': {'size': 22}},
                 number = {'suffix': " Days", 'font': {'color': color}},
-                gauge = {'axis': {'range': [0, 3000]}, 'bar': {'color': color},
+                gauge = {'axis': {'range': [3000, 0]}, 'bar': {'color': color},
                          'steps': [{'range': [0, 500], 'color': "#f8d7da"},    
                                    {'range': [500, 1500], 'color': "#fff3cd"}, 
                                    {'range': [1500, 3000], 'color': "#d1e7dd"}]}
@@ -100,14 +96,14 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
             st.plotly_chart(fig_gauge, use_container_width=True)
             
         with c2:
-            # العنكبوت (تعديل الحسابات بناء على الأرقام القصوى الجديدة)
+            # العنكبوت (Radar Chart)
             cats = ['Age Wear', 'Thermal Stress', 'Vibration Stress', 'Load Stress']
             vals = [(op_hours/100000)*100, (temp/200)*100, (vibration/10.0)*100, (load_current/300)*100]
             fig_radar = go.Figure(data=go.Scatterpolar(r=vals + [vals[0]], theta=cats + [cats[0]], fill='toself', line_color=color))
             fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, title="Equipment Stress Profile")
             st.plotly_chart(fig_radar, use_container_width=True)
 
-        # --- 7. الـ Bar Chart (تعديل الحسابات بناء على الأرقام الجديدة) ---
+        # --- 7. الـ Bar Chart (تأثير العناصر - Impact Analysis) ---
         st.markdown("---")
         st.subheader("🔍 Sensor Impact Analysis (Stress Factors)")
         
@@ -121,7 +117,7 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
         fig_bar = px.bar(df_impact, x='Stress Level (%)', y='Sensor', orientation='h', color='Stress Level (%)', color_continuous_scale='Reds', title="Which sensor is reducing the lifespan?")
         st.plotly_chart(fig_bar, use_container_width=True)
 
-        # --- 8. الـ Key Metrics (تعديل كلمة Confidence) ---
+        # --- 8. الـ Key Metrics (أرقام الخلاصة) ---
         st.markdown("---")
         st.subheader("📝 Key Maintenance Metrics")
         k1, k2, k3, k4 = st.columns(4)
