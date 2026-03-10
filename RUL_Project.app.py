@@ -43,12 +43,10 @@ st.markdown("---")
 with st.sidebar:
     st.header("📘 Project Documentation")
     
-    st.subheader("1. Executive Summary")
+    st.subheader("Executive Summary")
     st.write("This Deep Learning system utilizes Artificial Neural Networks (ANN) to predict the Remaining Useful Life (RUL) of critical power assets, enabling proactive maintenance strategies and preventing catastrophic failures.")
     
-    st.subheader("2. AI Architecture")
-    st.write("Built using a Multi-Layer Perceptron (MLP) with 3 hidden layers (128, 64, and 32 neurons), utilizing ReLU activation to capture complex non-linear relationships between equipment stressors.")
-    
+        
     with st.expander("Show Sensor Definitions"):
         st.write("**Operating Hours:** Cumulative running time (Aging).")
         st.write("**Load Current:** Electrical stress (Amps).")
