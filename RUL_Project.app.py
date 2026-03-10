@@ -46,12 +46,16 @@ st.markdown("---")
 st.sidebar.header("🎛️ Sensor Readings")
 
 with st.sidebar.expander("⏱️ Operational Data", expanded=True):
-    op_hours = st.slider("Operating Hours", 1000, 50000, 25000)
-    load_current = st.slider("Load Current (Amps)", 50.0, 150.0, 100.0)
+    # تعديل الماكسيمم لـ 100 ألف ساعة
+    op_hours = st.slider("Operating Hours", 1000, 100000, 25000)
+    # تعديل الماكسيمم لـ 300 أمبير
+    load_current = st.slider("Load Current (Amps)", 50.0, 300.0, 100.0)
 
 with st.sidebar.expander("🌡️ Condition Monitoring", expanded=True):
-    temp = st.slider("Temperature (°C)", 20.0, 100.0, 55.0)
-    vibration = st.slider("Vibration (mm/s)", 0.1, 5.0, 2.0)
+    # تعديل الماكسيمم لـ 200 درجة
+    temp = st.slider("Temperature (°C)", 20.0, 200.0, 55.0)
+    # تعديل الماكسيمم لـ 10 
+    vibration = st.slider("Vibration (mm/s)", 0.1, 10.0, 2.0)
 
 # --- 5. زر التوقع ---
 if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=True):
@@ -83,10 +87,10 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
         c1, c2 = st.columns(2)
         
         with c1:
-            # العداد (Gauge) بعد تعديل الألوان لتناسب السيرفر
+            # العداد (Gauge) وتعديل العنوان
             fig_gauge = go.Figure(go.Indicator(
                 mode = "gauge+number", value = predicted_rul,
-                title = {'text': f"Status: {status}", 'font': {'size': 24}},
+                title = {'text': f"Remaining Useful Life (RUL)<br><span style='font-size:0.8em;color:gray'>Status: {status}</span>", 'font': {'size': 22}},
                 number = {'suffix': " Days", 'font': {'color': color}},
                 gauge = {'axis': {'range': [0, 3000]}, 'bar': {'color': color},
                          'steps': [{'range': [0, 500], 'color': "#f8d7da"},    
@@ -96,35 +100,35 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
             st.plotly_chart(fig_gauge, use_container_width=True)
             
         with c2:
-            # العنكبوت (Radar Chart)
+            # العنكبوت (تعديل الحسابات بناء على الأرقام القصوى الجديدة)
             cats = ['Age Wear', 'Thermal Stress', 'Vibration Stress', 'Load Stress']
-            vals = [(op_hours/50000)*100, (temp/100)*100, (vibration/5.0)*100, (load_current/150)*100]
+            vals = [(op_hours/100000)*100, (temp/200)*100, (vibration/10.0)*100, (load_current/300)*100]
             fig_radar = go.Figure(data=go.Scatterpolar(r=vals + [vals[0]], theta=cats + [cats[0]], fill='toself', line_color=color))
             fig_radar.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), showlegend=False, title="Equipment Stress Profile")
             st.plotly_chart(fig_radar, use_container_width=True)
 
-        # --- 7. الـ Bar Chart (تأثير العناصر - Impact Analysis) ---
+        # --- 7. الـ Bar Chart (تعديل الحسابات بناء على الأرقام الجديدة) ---
         st.markdown("---")
         st.subheader("🔍 Sensor Impact Analysis (Stress Factors)")
         
         impact_map = {
-            "Thermal Load (Temp)": (temp/100) * 100,
-            "Mechanical Wear (Vibration)": (vibration/5.0) * 100,
-            "Electrical Load (Amps)": (load_current/150) * 100,
-            "Aging (Hours)": (op_hours/50000) * 100
+            "Thermal Load (Temp)": (temp/200) * 100,
+            "Mechanical Wear (Vibration)": (vibration/10.0) * 100,
+            "Electrical Load (Amps)": (load_current/300) * 100,
+            "Aging (Hours)": (op_hours/100000) * 100
         }
         df_impact = pd.DataFrame(impact_map.items(), columns=['Sensor', 'Stress Level (%)']).sort_values('Stress Level (%)', ascending=True)
         fig_bar = px.bar(df_impact, x='Stress Level (%)', y='Sensor', orientation='h', color='Stress Level (%)', color_continuous_scale='Reds', title="Which sensor is reducing the lifespan?")
         st.plotly_chart(fig_bar, use_container_width=True)
 
-        # --- 8. الـ Key Metrics (أرقام الخلاصة) ---
+        # --- 8. الـ Key Metrics (تعديل كلمة Confidence) ---
         st.markdown("---")
         st.subheader("📝 Key Maintenance Metrics")
         k1, k2, k3, k4 = st.columns(4)
         k1.metric("Predicted RUL", f"{predicted_rul} Days", "Urgent" if predicted_rul < 500 else "Stable", delta_color="inverse")
         k2.metric("Temp Sensor", f"{temp} °C", "Overheating" if temp > 70 else "Normal", delta_color="inverse")
         k3.metric("Vibration", f"{vibration} mm/s", "High" if vibration > 3.5 else "Smooth", delta_color="inverse")
-        k4.metric("AI Confidence", "97.67%", "Validated")
+        k4.metric("Confidence", "97.67%", "Validated")
         
 else:
     st.info("👈 Adjust sensor readings in the sidebar and click **Predict**.")
