@@ -83,15 +83,15 @@ if st.sidebar.button("🔮 Predict Remaining Life (RUL)", use_container_width=Tr
         c1, c2 = st.columns(2)
         
         with c1:
-            # العداد (Gauge)
+            # العداد (Gauge) بعد تعديل الألوان لتناسب السيرفر
             fig_gauge = go.Figure(go.Indicator(
                 mode = "gauge+number", value = predicted_rul,
                 title = {'text': f"Status: {status}", 'font': {'size': 24}},
                 number = {'suffix': " Days", 'font': {'color': color}},
                 gauge = {'axis': {'range': [0, 3000]}, 'bar': {'color': color},
-                         'steps': [{'range': [0, 500], 'color': "#EF553B33"},
-                                   {'range': [500, 1500], 'color': "#FECB5233"},
-                                   {'range': [1500, 3000], 'color': "#00CC9633"}]}
+                         'steps': [{'range': [0, 500], 'color': "#f8d7da"},    
+                                   {'range': [500, 1500], 'color': "#fff3cd"}, 
+                                   {'range': [1500, 3000], 'color': "#d1e7dd"}]}
             ))
             st.plotly_chart(fig_gauge, use_container_width=True)
             
